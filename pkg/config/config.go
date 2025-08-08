@@ -5,21 +5,21 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 var db *gorm.DB
 
 func Connect() {
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
 
-	godotenv.Load()
-
-	dbHost := getEnv("DB_HOST", "localhost")
-	dbPort := getEnv("DB_PORT", "5432")
-	dbUser := getEnv("DB_USER", "admin")
-	dbPassword := getEnv("DB_PASSWORD", "admin")
-	dbName := getEnv("DB_NAME", "bookstore")
+	if dbHost == "" || dbPort == "" || dbUser == "" || dbPassword == "" || dbName == "" {
+		panic("One or more required database environment variables are missing")
+	}
 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
@@ -35,11 +35,4 @@ func Connect() {
 
 func GetDb() *gorm.DB {
 	return db
-}
-
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
 }
